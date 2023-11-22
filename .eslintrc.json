@@ -1,0 +1,86 @@
+{
+  "extends": "airbnb-base",
+  "overrides": [
+    {
+      "extends": [
+        "./config/typescript.eslintrc.json"
+      ],
+      "files": "*.ts"
+    },
+    {
+      "extends": [
+        "./config/typescript.eslintrc.json"
+      ],
+      "files": "*.tsx",
+      "parserOptions": {
+        "ecmaFeatures": {
+          "jsx": true
+        }
+      }
+    }
+  ],
+  "rules": {
+    "arrow-parens": [
+      "warn",
+      "as-needed"
+    ],
+    "curly": "off",
+    "import/extensions": "off",
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": [
+          "**/*.test.*",
+          "**/*.config.*"
+        ]
+      }
+    ],
+    "import/order": [
+      "warn",
+      {
+        "newlines-between": "always"
+      }
+    ],
+    "no-console": "off",
+    "no-nested-ternary": "off",
+    "no-promise-executor-return": "off",
+    "no-underscore-dangle": [
+      "warn",
+      {
+        "allow": [
+          "__filename",
+          "__dirname"
+        ]
+      }
+    ],
+    "no-unused-expressions": [
+      "error",
+      {
+        "allowShortCircuit": true,
+        "allowTaggedTemplates": true,
+        "allowTernary": true
+      }
+    ],
+    "nonblock-statement-body-position": [
+      "warn",
+      "below"
+    ],
+    "prefer-template": "off",
+    "quotes": [
+      "warn",
+      "single"
+    ],
+    "require-await": "error",
+    "semi": [
+      "warn",
+      "always"
+    ],
+    "sort-imports": [
+      "warn",
+      {
+        "allowSeparatedGroups": true
+      }
+    ],
+    "sort-vars": "warn"
+  }
+}
