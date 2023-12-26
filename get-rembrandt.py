@@ -1,8 +1,10 @@
-from io import StringIO
+# ruff: noqa: T201
+
+import contextlib
 from os import environ, getenv
 from pathlib import Path
-from subprocess import check_output, STDOUT
-from sys import stderr, CalledProcessError
+from subprocess import STDOUT, CalledProcessError, check_output
+from sys import stderr
 
 REGION_NAME = "ap-northeast-1"
 REPOSITORY = "development"
@@ -37,21 +39,15 @@ else:
     import boto3
 
     account_id = boto3.client("sts").get_caller_identity().get("Account")
-
     client = boto3.client("codeartifact", region_name=REGION_NAME)
     response = client.get_authorization_token(domain=DOMAIN, domainOwner=account_id)
     print(response, file=stderr)
 
     pip_extra_index_url = f'https://aws:{response["authorizationToken"]}@{DOMAIN}-{account_id}.d.codeartifact.{REGION_NAME}.amazonaws.com/pypi/{REPOSITORY}/simple/'
 
-print("export PIP_EXTRA_INDEX_URL=" + pip_extra_index_url)
-try:
+with contextlib.suppress(OSError):
     docker_secret_path.write_text(pip_extra_index_url)
-    print(docker_usage,
-        file=stderr,
-    )
-except OSError:
-    ...
+    print(docker_usage, file=stderr)
 
 try:
     stderr.buffer.write(check_output(
@@ -63,4 +59,4 @@ try:
     ))
 except CalledProcessError as error:
     print(error.output, file=stderr)
-    raise error
+    raise
