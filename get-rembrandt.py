@@ -27,7 +27,7 @@ services:
             secrets: pip-extra-index-url
 secrets:
     pip-extra-index-url:
-        name:
+        name: pip-extra-index-url
         file: {docker_secret_path}
 """
 
@@ -50,13 +50,15 @@ with contextlib.suppress(OSError):
     print(docker_usage, file=stderr)
 
 try:
-    stderr.buffer.write(check_output(
-        ["pip", "install", "rembrandt"],
-        stderr=STDOUT,
-        env=None
-        if parent_pip_extra_index_url
-        else {**environ, "PIP_EXTRA_INDEX_URL": pip_extra_index_url},
-    ))
+    stderr.buffer.write(
+        check_output(
+            ["pip", "install", "rembrandt"],
+            stderr=STDOUT,
+            env=None
+            if parent_pip_extra_index_url
+            else {**environ, "PIP_EXTRA_INDEX_URL": pip_extra_index_url},
+        ),
+    )
 except CalledProcessError as error:
     print(error.output, file=stderr)
     raise
