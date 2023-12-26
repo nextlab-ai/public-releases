@@ -2,7 +2,7 @@ from io import StringIO
 from os import environ, getenv
 from pathlib import Path
 from subprocess import check_output, STDOUT
-from sys import stderr
+from sys import stderr, CalledProcessError
 
 REGION_NAME = "ap-northeast-1"
 REPOSITORY = "development"
@@ -42,7 +42,7 @@ else:
     response = client.get_authorization_token(domain=DOMAIN, domainOwner=account_id)
     print(response, file=stderr)
 
-    pip_extra_index_url = f'https://aws:${response["authorizationToken"]}@${DOMAIN}-${account_id}.d.codeartifact.${REGION_NAME}.amazonaws.com/pypi/${REPOSITORY}/simple/'
+    pip_extra_index_url = f'https://aws:{response["authorizationToken"]}@{DOMAIN}-{account_id}.d.codeartifact.{REGION_NAME}.amazonaws.com/pypi/{REPOSITORY}/simple/'
 
 print("export PIP_EXTRA_INDEX_URL=" + pip_extra_index_url)
 try:
@@ -53,10 +53,14 @@ try:
 except OSError:
     ...
 
-stderr.buffer.write(check_output(
-    ["pip", "install", "rembrandt"],
-    stderr=STDOUT,
-    env=None
-    if parent_pip_extra_index_url
-    else {**environ, "PIP_EXTRA_INDEX_URL": pip_extra_index_url},
-))
+try:
+    stderr.buffer.write(check_output(
+        ["pip", "install", "rembrandt"],
+        stderr=STDOUT,
+        env=None
+        if parent_pip_extra_index_url
+        else {**environ, "PIP_EXTRA_INDEX_URL": pip_extra_index_url},
+    ))
+except CalledProcessError as error:
+    print(error.output, file=stderr)
+    raise error
